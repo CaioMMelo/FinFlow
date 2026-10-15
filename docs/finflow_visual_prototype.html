@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>FinFlow - Protótipo Interativo & Assistente IA</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0F172A; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .fade-in { animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-[#0B1120] text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 antialiased font-sans">
+
+  <!-- Header & Instructions -->
+  <div class="max-w-md w-full text-center mb-3">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Protótipo Visual Interativo (Flutter Preview)
+    </div>
+    <h1 class="text-xl font-bold text-white tracking-tight">FinFlow Mobile & Assistente IA</h1>
+    <p class="text-slate-400 text-xs mt-0.5">Teste o desbloqueio biométrico, extrato, PDF oficial e converse com o FinBot</p>
+  </div>
+
+  <!-- Smartphone Frame Mockup -->
+  <div class="w-[380px] h-[790px] bg-[#0F172A] rounded-[44px] p-3 shadow-2xl border-[6px] border-slate-700 relative flex flex-col overflow-hidden">
+    
+    <!-- Phone Dynamic Island -->
+    <div class="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-50 flex items-center justify-end px-3">
+      <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-700"></div>
+    </div>
+
+    <!-- Phone Status Bar -->
+    <div class="pt-5 px-6 pb-2 flex justify-between items-center text-[11px] text-slate-400 select-none z-40">
+      <span class="font-semibold text-slate-200">19:50</span>
+      <div class="flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
+        <span class="text-[10px] font-bold">5G</span>
+        <div class="w-5 h-2.5 border border-slate-400 rounded-sm p-0.5 flex items-center">
+          <div class="w-full h-full bg-emerald-400 rounded-xs"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP SCREEN CONTAINER -->
+    <div id="screenContainer" class="flex-1 overflow-y-auto px-4 pb-20 pt-1 relative">
+
+      <!-- ================= 0. SECURITY GATE SCREEN ================= -->
+      <div id="viewSecurityGate" class="h-full flex flex-col items-center justify-center text-center px-4 py-8 fade-in">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 mb-6 shadow-lg shadow-emerald-500/20">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-white mb-2">FinFlow Security Gate</h2>
+        <p class="text-xs text-slate-400 mb-8 leading-relaxed">
+          Protegido por Criptografia de Hardware (Keystore/Keychain) e Biometria
+        </p>
+
+        <button onclick="unlockApp()" class="w-full py-3.5 px-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition active:scale-95 text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0c0 1.27.18 2.498.514 3.659"/></svg>
+          Desbloquear com Biometria
+        </button>
+
+        <span class="text-[11px] text-slate-500 mt-6 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Conforme com LGPD & Padrão Gov
+        </span>
+      </div>
+
+      <!-- ================= 1. EXTRATO / TRANSACTIONS SCREEN ================= -->
+      <div id="viewTransactions" class="hidden fade-in">
+        <!-- App Bar -->
+        <div class="flex items-center justify-between py-2 mb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center font-black text-slate-950 text-sm">F</div>
+            <span class="font-bold text-white text-base">FinFlow</span>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="toggleModal('modalPdfPreview', true)" title="Exportar PDF" class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center hover:bg-indigo-500/30 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </button>
+            <button onclick="openFinBot()" title="Assistente IA" class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/30 transition">
+              <span class="text-xs">🤖</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 mb-4 shadow-lg">
+          <span class="text-slate-400 text-xs font-medium">Saldo Total Disponível</span>
+          <div id="displayTotalBalance" class="text-2xl font-black text-white mt-1 tracking-tight">R$ 2.375,50</div>
+          
+          <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-700/60">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block">Entradas</span>
+                <span id="displayIncome" class="text-xs font-bold text-emerald-400">R$ 2.500,00</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block">Saídas</span>
+                <span id="displayExpense" class="text-xs font-bold text-rose-400">R$ 124,50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transaction List Header -->
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-bold text-sm text-slate-200">Extrato Recente</h3>
+          <span onclick="toggleModal('modalPdfPreview', true)" class="text-xs text-indigo-400 cursor-pointer flex items-center gap-1 font-semibold">
+            📄 Baixar Extrato PDF
+          </span>
+        </div>
+
+        <!-- Transaction Items -->
+        <div id="txListContainer" class="space-y-2">
+          <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-white">Bolsa Estágio / Salário</h4>
+                <p class="text-[10px] text-slate-400">Secretaria de Estado do RJ</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-emerald-400">+ R$ 2.500,00</span>
+          </div>
+
+          <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-white">Almoço no Centro</h4>
+                <p class="text-[10px] text-slate-400">Alimentação diária</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-rose-400">- R$ 38,50</span>
+          </div>
+
+          <div class="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+              </div>
+              <div>
+                <h4 class="text-xs font-semibold text-white">Metrô Rio - Bilhete Único</h4>
+                <p class="text-[10px] text-slate-400">Transporte ida/volta</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-rose-400">- R$ 86,00</span>
+          </div>
+        </div>
+
+        <!-- FAB Button -->
+        <button onclick="toggleModal('modalNewTx', true)" class="fixed bottom-20 right-6 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-full shadow-lg shadow-emerald-500/30 flex items-center gap-1.5 text-xs transition active:scale-95 z-30">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nova Transação
+        </button>
+      </div>
+
+      <!-- ================= 2. ORÇAMENTOS 50/30/20 SCREEN ================= -->
+      <div id="viewBudgets" class="hidden fade-in">
+        <div class="py-2 mb-3">
+          <h2 class="text-base font-bold text-white">Orçamento & Metas</h2>
+          <p class="text-[11px] text-slate-400">Metodologia 50/30/20 aplicada</p>
+        </div>
+
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 mb-4">
+          <div class="flex items-center justify-center gap-6 py-2">
+            <div class="w-28 h-28 rounded-full flex items-center justify-center relative shadow-inner"
+                 style="background: conic-gradient(#10B981 0% 50%, #6366F1 50% 80%, #F59E0B 80% 100%);">
+              <div class="w-16 h-16 rounded-full bg-[#0F172A] flex flex-col items-center justify-center">
+                <span class="text-[10px] text-slate-400">Planejado</span>
+                <span class="text-xs font-black text-white">100%</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span class="text-slate-300">50% Necessidades</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                <span class="text-slate-300">30% Desejos/Lazer</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span class="text-slate-300">20% Reserva/Metas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-bold text-white">Moradia & Contas</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400">Necessidades (50%)</span>
+            </div>
+            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-1">
+              <div class="bg-emerald-500 h-full rounded-full" style="width: 79%;"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>R$ 950,00 gastos</span>
+              <span>Teto: R$ 1.200,00 (79%)</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-bold text-white">Restaurantes & Lazer</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400">Desejos (30%)</span>
+            </div>
+            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-1">
+              <div class="bg-indigo-500 h-full rounded-full" style="width: 76%;"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span>R$ 380,00 gastos</span>
+              <span>Teto: R$ 500,00 (76%)</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/70 border border-slate-700/60 rounded-xl p-3">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-bold text-white">Reserva de Emergência</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400">Metas (20%)</span>
+            </div>
+            <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-1">
+              <div class="bg-amber-500 h-full rounded-full" style="width: 100%;"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-400">
+              <span class="text-emerald-400 font-semibold">R$ 600,00 poupados</span>
+              <span class="text-emerald-400 font-semibold">100% atingido! 🎯</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 3. INSIGHTS INTELIGENTES SCREEN ================= -->
+      <div id="viewInsights" class="hidden fade-in">
+        <div class="flex justify-between items-center py-2 mb-3">
+          <div>
+            <h2 class="text-base font-bold text-white">Insights & Diagnóstico</h2>
+            <p class="text-[11px] text-slate-400">Inteligência analítica do app</p>
+          </div>
+          <button onclick="toggleModal('modalPdfPreview', true)" class="px-2.5 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-indigo-500/30 transition">
+            📄 Exportar PDF
+          </button>
+        </div>
+
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 mb-3 flex items-center gap-4">
+          <div class="w-16 h-16 rounded-full border-4 border-emerald-500 flex flex-col items-center justify-center shrink-0">
+            <span class="text-lg font-black text-white">84</span>
+            <span class="text-[8px] text-slate-400">/ 100</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+              Saúde Excelente
+            </span>
+            <h4 class="text-xs font-bold text-white mt-1">Diagnóstico Geral</h4>
+            <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">Você guardou 32.5% da renda este mês, superando a meta de 20%.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 mb-3">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold text-white">Evolução Mensal (R$)</span>
+            <div class="flex gap-2 text-[10px] text-slate-400">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-xs bg-emerald-500"></span> Entradas</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-xs bg-rose-500"></span> Saídas</span>
+            </div>
+          </div>
+
+          <div class="h-28 flex items-end justify-around pt-2 border-b border-slate-700">
+            <div class="flex flex-col items-center gap-1">
+              <div class="flex items-end gap-1.5 h-20">
+                <div class="w-3 bg-emerald-500 rounded-t-sm" style="height: 80%;"></div>
+                <div class="w-3 bg-rose-500 rounded-t-sm" style="height: 60%;"></div>
+              </div>
+              <span class="text-[10px] text-slate-400">Ago</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="flex items-end gap-1.5 h-20">
+                <div class="w-3 bg-emerald-500 rounded-t-sm" style="height: 85%;"></div>
+                <div class="w-3 bg-rose-500 rounded-t-sm" style="height: 55%;"></div>
+              </div>
+              <span class="text-[10px] text-slate-400">Set</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="flex items-end gap-1.5 h-20">
+                <div class="w-3 bg-emerald-500 rounded-t-sm" style="height: 85%;"></div>
+                <div class="w-3 bg-rose-500 rounded-t-sm" style="height: 48%;"></div>
+              </div>
+              <span class="text-[10px] text-emerald-400 font-bold">Out</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-indigo-500/10 border border-indigo-500/30 rounded-2xl p-3.5">
+          <div class="flex items-start gap-2.5">
+            <div class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">💡</div>
+            <div>
+              <h5 class="text-xs font-bold text-indigo-300">Dica Personalizada</h5>
+              <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">
+                Seus maiores gastos variáveis estão em <b>Alimentação & Lazer</b> (R$ 418). Economizando 10%, sua reserva atinge a meta 2 meses antes!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+    <div id="navBar" class="hidden absolute bottom-3 left-4 right-4 bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-2xl p-1.5 flex justify-around items-center z-40 shadow-xl">
+      <button onclick="switchTab('transactions')" id="navTransactions" class="flex flex-col items-center py-1 px-3 rounded-xl text-emerald-400 font-bold text-[10px] transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Extrato
+      </button>
+
+      <button onclick="switchTab('budgets')" id="navBudgets" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-200 text-[10px] transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+        Orçamento
+      </button>
+
+      <button onclick="switchTab('insights')" id="navInsights" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-200 text-[10px] transition">
+        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Insights
+      </button>
+
+      <button onclick="openFinBot()" id="navBot" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-emerald-400 text-[10px] transition">
+        <span class="text-base mb-0.5">🤖</span>
+        FinBot IA
+      </button>
+    </div>
+
+    <!-- Phone Home Indicator Bar -->
+    <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-600 rounded-full z-50"></div>
+
+    <!-- ================= MODAL 1: NOVA TRANSAÇÃO ================= -->
+    <div id="modalNewTx" class="hidden absolute inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end justify-center p-3">
+      <div class="w-full bg-slate-800 border border-slate-700 rounded-3xl p-5 fade-in">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-bold text-sm text-white">Nova Movimentação</h3>
+          <button onclick="toggleModal('modalNewTx', false)" class="text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
+
+        <!-- OCR Scanner Button -->
+        <button onclick="simulateOcrScan()" class="w-full mb-3 py-2 px-3 rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 flex items-center justify-center gap-2 text-xs font-bold transition">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          📸 Escanear Comprovante com Câmera (OCR)
+        </button>
+
+        <div class="flex gap-2 mb-3">
+          <button id="btnTypeExpense" onclick="setTxType('expense')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">Despesa</button>
+          <button id="btnTypeIncome" onclick="setTxType('income')" class="flex-1 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-400 border border-transparent">Receita</button>
+        </div>
+
+        <div class="space-y-2 mb-4">
+          <input id="inputTitle" type="text" placeholder="Ex: Farmácia, Café, Passagem" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <input id="inputAmount" type="number" step="0.01" placeholder="Valor (R$)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <button onclick="saveTransaction()" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition">
+          Salvar Transação
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= MODAL 2: PREVIEW DE PDF EXTRATO OFICIAL ================= -->
+    <div id="modalPdfPreview" class="hidden absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col justify-end p-2">
+      <div class="w-full h-[90%] bg-white text-slate-900 rounded-3xl p-4 flex flex-col shadow-2xl fade-in overflow-hidden">
+        <!-- PDF Document Header Controls -->
+        <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+            <span class="text-xs font-bold text-slate-800">extrato_finflow_outubro.pdf</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="alert('Simulando envio para a impressora nativa do celular...')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-[11px] font-semibold text-slate-700">🖨️ Imprimir</button>
+            <button onclick="toggleModal('modalPdfPreview', false)" class="text-slate-500 hover:text-slate-800 font-bold text-sm px-1.5">✕</button>
+          </div>
+        </div>
+
+        <!-- Simulated A4 Document Body -->
+        <div class="flex-1 overflow-y-auto py-3 px-1 text-[10px] space-y-3 font-mono">
+          <div class="flex justify-between items-start border-b border-slate-300 pb-2">
+            <div>
+              <h2 class="text-sm font-black text-slate-900 tracking-tight font-sans">FinFlow - Gestão Financeira</h2>
+              <p class="text-[9px] text-slate-500 font-sans">Relatório Consolidado de Movimentações (Mês Vigente)</p>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[8px] font-sans">EXTRATO OFICIAL</span>
+          </div>
+
+          <!-- KPI Summary -->
+          <div class="grid grid-cols-3 gap-2 bg-slate-100 p-2 rounded-lg text-center font-sans">
+            <div>
+              <span class="text-[8px] text-slate-500 block">SALDO LÍQUIDO</span>
+              <span class="text-xs font-bold text-emerald-700" id="pdfBalance">R$ 2.375,50</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-500 block">TOTAL RECEITAS</span>
+              <span class="text-xs font-bold text-emerald-600" id="pdfIncome">R$ 2.500,00</span>
+            </div>
+            <div>
+              <span class="text-[8px] text-slate-500 block">TOTAL DESPESAS</span>
+              <span class="text-xs font-bold text-rose-600" id="pdfExpense">R$ 124,50</span>
+            </div>
+          </div>
+
+          <!-- 50/30/20 Table -->
+          <div>
+            <h4 class="font-bold text-[10px] text-slate-800 font-sans mb-1">Metas & Orçamento (50/30/20)</h4>
+            <table class="w-full border-collapse border border-slate-300 text-[8px]">
+              <tr class="bg-slate-200 text-slate-700 font-bold">
+                <th class="border border-slate-300 p-1 text-left">Meta</th>
+                <th class="border border-slate-300 p-1">Teto</th>
+                <th class="border border-slate-300 p-1">Realizado</th>
+                <th class="border border-slate-300 p-1">Status</th>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">Moradia (50%)</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 1.200,00</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 950,00</td>
+                <td class="border border-slate-300 p-1 text-center text-emerald-700">79%</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">Lazer (30%)</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 500,00</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 380,00</td>
+                <td class="border border-slate-300 p-1 text-center text-emerald-700">76%</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">Reserva (20%)</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 600,00</td>
+                <td class="border border-slate-300 p-1 text-center">R$ 600,00</td>
+                <td class="border border-slate-300 p-1 text-center text-emerald-700 font-bold">100% 🎯</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Transactions Table -->
+          <div>
+            <h4 class="font-bold text-[10px] text-slate-800 font-sans mb-1">Últimos Lançamentos</h4>
+            <table class="w-full border-collapse border border-slate-300 text-[8px]">
+              <tr class="bg-slate-200 text-slate-700 font-bold">
+                <th class="border border-slate-300 p-1 text-left">Data</th>
+                <th class="border border-slate-300 p-1 text-left">Descrição</th>
+                <th class="border border-slate-300 p-1">Tipo</th>
+                <th class="border border-slate-300 p-1 text-right">Valor</th>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">11/10</td>
+                <td class="border border-slate-300 p-1">Bolsa Estágio (Estado RJ)</td>
+                <td class="border border-slate-300 p-1 text-center text-emerald-700">Receita</td>
+                <td class="border border-slate-300 p-1 text-right font-bold text-emerald-700">+ R$ 2.500,00</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">14/10</td>
+                <td class="border border-slate-300 p-1">Almoço no Centro</td>
+                <td class="border border-slate-300 p-1 text-center text-rose-700">Despesa</td>
+                <td class="border border-slate-300 p-1 text-right font-bold text-rose-700">- R$ 38,50</td>
+              </tr>
+              <tr>
+                <td class="border border-slate-300 p-1">13/10</td>
+                <td class="border border-slate-300 p-1">Metrô Rio Bilhete Único</td>
+                <td class="border border-slate-300 p-1 text-center text-rose-700">Despesa</td>
+                <td class="border border-slate-300 p-1 text-right font-bold text-rose-700">- R$ 86,00</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="border-t border-slate-300 pt-2 text-[7px] text-slate-400 flex justify-between font-sans">
+            <span>Gerado por FinFlow • Criptografia de Hardware em Repouso</span>
+            <span>Página 1 de 1</span>
+          </div>
+        </div>
+
+        <button onclick="alert('Compartilhando PDF via WhatsApp / E-mail / Arquivos...')" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition">
+          📤 Compartilhar PDF do Extrato
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= MODAL 3: ASSISTENTE VIRTUAL DE IA (FINBOT) ================= -->
+    <div id="modalFinBot" class="hidden absolute inset-0 bg-black/75 backdrop-blur-sm z-50 flex flex-col justify-end p-2">
+      <div class="w-full h-[88%] bg-slate-900 border border-slate-700 rounded-3xl p-4 flex flex-col shadow-2xl fade-in">
+        <!-- Bot Header -->
+        <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-base">🤖</div>
+            <div>
+              <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                FinBot AI
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              </h3>
+              <p class="text-[9px] text-slate-400">Copiloto Financeiro Conectado</p>
+            </div>
+          </div>
+          <button onclick="toggleModal('modalFinBot', false)" class="text-slate-400 hover:text-white text-xs font-bold px-2 py-1">✕</button>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto py-3 space-y-2.5 text-xs">
+          <!-- Bot message -->
+          <div class="flex items-start gap-2">
+            <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-xs flex items-center justify-center shrink-0 mt-0.5">🤖</div>
+            <div class="bg-slate-800 border border-slate-700/80 rounded-2xl rounded-tl-sm p-3 text-slate-200 leading-relaxed max-w-[85%]">
+              Olá! Eu analisei seu saldo de <b>R$ 2.375,50</b> e suas despesas recentes. Como posso te orientar hoje?
+            </div>
+          </div>
+        </div>
+
+        <!-- Suggested Prompt Chips -->
+        <div class="flex gap-1.5 overflow-x-auto py-2 scrollbar-none">
+          <button onclick="askBot('Quanto gastei em alimentação?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] hover:border-emerald-500 hover:text-emerald-400 transition">
+            🍽️ Gasto em alimentação?
+          </button>
+          <button onclick="askBot('Posso comprar um fone de R$ 150?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] hover:border-emerald-500 hover:text-emerald-400 transition">
+            🎧 Comprar fone de R$ 150?
+          </button>
+          <button onclick="askBot('Como está minha reserva?')" class="whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-[10px] hover:border-emerald-500 hover:text-emerald-400 transition">
+            🛡️ Status da reserva
+          </button>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="flex gap-1.5 pt-1">
+          <input id="inputBotQuery" type="text" placeholder="Pergunte sobre seus gastos ou orçamentos..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <button onclick="sendUserMessage()" class="w-8 h-8 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 flex items-center justify-center font-bold text-xs transition">
+            ➤
+          </button>
+        </div>
+    <!-- ================= MODAL 4: SIMULADOR DE CÂMERA & SCANNER OCR ================= -->
+    <div id="modalOcrScanner" class="hidden absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col justify-between p-4 fade-in">
+      <div class="flex justify-between items-center text-white pt-6">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+          <span class="text-xs font-bold tracking-wide">OCR SCANNER ATIVO</span>
+        </div>
+        <button onclick="toggleModal('modalOcrScanner', false)" class="text-slate-400 hover:text-white font-bold text-sm">✕</button>
+      </div>
+
+      <!-- Camera Viewfinder & Receipt Preview -->
+      <div class="relative w-full h-80 border-2 border-emerald-400/80 rounded-2xl flex flex-col items-center justify-center overflow-hidden bg-slate-900/60 p-4">
+        <!-- Laser Scanner line animation -->
+        <div class="absolute inset-x-0 h-1 bg-emerald-400 shadow-[0_0_12px_#10B981] animate-bounce"></div>
+        
+        <!-- Simulated Receipt -->
+        <div class="bg-white text-slate-900 w-52 p-3 rounded-lg shadow-xl text-[9px] font-mono rotate-1 scale-95 opacity-90">
+          <p class="font-bold text-center border-b pb-1">RESTAURANTE SABOR CARIOCA</p>
+          <p class="text-center text-[7px] text-slate-500">Rua da Carioca, Centro - RJ</p>
+          <div class="my-2 border-b border-dashed pb-1">
+            <div class="flex justify-between"><span>1x Almoço Executivo</span><span>R$ 48,00</span></div>
+            <div class="flex justify-between"><span>1x Suco Natural</span><span>R$ 6,90</span></div>
+          </div>
+          <div class="flex justify-between font-bold text-xs pt-0.5">
+            <span>TOTAL:</span>
+            <span>R$ 54,90</span>
+          </div>
+          <p class="text-[7px] text-slate-400 text-center mt-2">DATA: 14/10/2026 13:42</p>
+        </div>
+      </div>
+
+      <div class="text-center pb-8 space-y-2">
+        <p class="text-xs text-emerald-400 font-semibold animate-pulse">Detectando texto com Google ML Kit On-Device...</p>
+        <p class="text-[10px] text-slate-400">Posicione o cupom dentro do quadro para leitura automática</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentBalance = 2375.50;
+    let currentIncome = 2500.00;
+    let currentExpense = 124.50;
+    let currentTxType = 'expense';
+
+    function unlockApp() {
+      document.getElementById('viewSecurityGate').classList.add('hidden');
+      document.getElementById('navBar').classList.remove('hidden');
+      switchTab('transactions');
+    }
+
+    function switchTab(tab) {
+      document.getElementById('viewTransactions').classList.add('hidden');
+      document.getElementById('viewBudgets').classList.add('hidden');
+      document.getElementById('viewInsights').classList.add('hidden');
+
+      document.getElementById('navTransactions').className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-200 text-[10px] transition";
+      document.getElementById('navBudgets').className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-200 text-[10px] transition";
+      document.getElementById('navInsights').className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 hover:text-slate-200 text-[10px] transition";
+
+      if (tab === 'transactions') {
+        document.getElementById('viewTransactions').classList.remove('hidden');
+        document.getElementById('navTransactions').className = "flex flex-col items-center py-1 px-3 rounded-xl text-emerald-400 font-bold text-[10px] transition";
+      } else if (tab === 'budgets') {
+        document.getElementById('viewBudgets').classList.remove('hidden');
+        document.getElementById('navBudgets').className = "flex flex-col items-center py-1 px-3 rounded-xl text-indigo-400 font-bold text-[10px] transition";
+      } else if (tab === 'insights') {
+        document.getElementById('viewInsights').classList.remove('hidden');
+        document.getElementById('navInsights').className = "flex flex-col items-center py-1 px-3 rounded-xl text-amber-400 font-bold text-[10px] transition";
+      }
+    }
+
+    function toggleModal(modalId, show) {
+      const modal = document.getElementById(modalId);
+      if (show) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+
+    function openFinBot() {
+      toggleModal('modalFinBot', true);
+    }
+
+    function setTxType(type) {
+      currentTxType = type;
+      const btnExp = document.getElementById('btnTypeExpense');
+      const btnInc = document.getElementById('btnTypeIncome');
+
+      if (type === 'expense') {
+        btnExp.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40";
+        btnInc.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-400 border border-transparent";
+      } else {
+        btnInc.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        btnExp.className = "flex-1 py-1.5 rounded-lg text-xs font-bold bg-slate-700 text-slate-400 border border-transparent";
+      }
+    }
+
+    function saveTransaction() {
+      const title = document.getElementById('inputTitle').value.trim();
+      const amount = parseFloat(document.getElementById('inputAmount').value);
+
+      if (!title || isNaN(amount) || amount <= 0) {
+        alert('Por favor, preencha o título e um valor maior que zero.');
+        return;
+      }
+
+      if (currentTxType === 'expense') {
+        currentBalance -= amount;
+        currentExpense += amount;
+      } else {
+        currentBalance += amount;
+        currentIncome += amount;
+      }
+
+      // Update Header Display
+      const balStr = `R$ ${currentBalance.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      const incStr = `R$ ${currentIncome.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      const expStr = `R$ ${currentExpense.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+      document.getElementById('displayTotalBalance').innerText = balStr;
+      document.getElementById('displayIncome').innerText = incStr;
+      document.getElementById('displayExpense').innerText = expStr;
+
+      // Update PDF Display
+      document.getElementById('pdfBalance').innerText = balStr;
+      document.getElementById('pdfIncome').innerText = incStr;
+      document.getElementById('pdfExpense').innerText = expStr;
+
+      // Insert new element into list
+      const container = document.getElementById('txListContainer');
+      const isExp = currentTxType === 'expense';
+      const color = isExp ? 'rose' : 'emerald';
+      const prefix = isExp ? '-' : '+';
+
+      const newCard = document.createElement('div');
+      newCard.className = `bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 flex items-center justify-between fade-in`;
+      newCard.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-${color}-500/10 flex items-center justify-center text-${color}-400 font-bold text-xs">
+            ${isExp ? '↓' : '↑'}
+          </div>
+          <div>
+            <h4 class="text-xs font-semibold text-white">${title}</h4>
+            <p class="text-[10px] text-slate-400">Registrado agora mesmo</p>
+          </div>
+        </div>
+        <span class="text-xs font-bold text-${color}-400">${prefix} R$ ${amount.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+      `;
+
+      container.insertBefore(newCard, container.firstChild);
+
+      document.getElementById('inputTitle').value = '';
+      document.getElementById('inputAmount').value = '';
+      toggleModal('modalNewTx', false);
+    }
+
+    // AI ASSISTANT SIMULATION
+    function askBot(prompt) {
+      document.getElementById('inputBotQuery').value = prompt;
+      sendUserMessage();
+    }
+
+    function sendUserMessage() {
+      const input = document.getElementById('inputBotQuery');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const container = document.getElementById('chatMessages');
+
+      // User Message
+      const userMsg = document.createElement('div');
+      userMsg.className = "flex items-start justify-end gap-2 fade-in";
+      userMsg.innerHTML = `
+        <div class="bg-emerald-500 text-slate-950 font-medium rounded-2xl rounded-tr-sm p-2.5 max-w-[85%] text-xs">
+          ${text}
+        </div>
+      `;
+      container.appendChild(userMsg);
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+
+      // Bot Response
+      setTimeout(() => {
+        let answer = "Entendido! Baseado nos seus dados locais encriptados no SQLite, sua situação financeira está sólida.";
+
+        const lower = text.toLowerCase();
+        if (lower.includes('alimentação') || lower.includes('almoço')) {
+          answer = "Você gastou <b>R$ 38,50</b> em alimentação recente ('Almoço no Centro') e o total orçado para alimentação neste mês está dentro do limite com 79% consumido.";
+        } else if (lower.includes('comprar') || lower.includes('fone')) {
+          answer = "Sim! Você tem <b>R$ 120,00</b> disponíveis no teto de 'Desejos & Lazer' (30%). Uma compra de R$ 150 excederia em apenas R$ 30, mas você pode remanejar da categoria de economias sem afetar sua reserva de emergência!";
+        } else if (lower.includes('reserva') || lower.includes('meta')) {
+          answer = "Excelente notícia: sua meta de <b>Reserva de Emergência Tesouro Selic</b> atingiu <b>100% (R$ 600,00 poupados)</b> este mês! Parabéns pelo cumprimento da regra dos 20%!";
+        }
+
+        const botMsg = document.createElement('div');
+        botMsg.className = "flex items-start gap-2 fade-in";
+        botMsg.innerHTML = `
+          <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-xs flex items-center justify-center shrink-0 mt-0.5">🤖</div>
+          <div class="bg-slate-800 border border-slate-700/80 rounded-2xl rounded-tl-sm p-3 text-slate-200 leading-relaxed max-w-[85%] text-xs">
+            ${answer}
+          </div>
+        `;
+        container.appendChild(botMsg);
+        container.scrollTop = container.scrollHeight;
+      }, 500);
+    }
+
+    // OCR SCANNER SIMULATION
+    function simulateOcrScan() {
+      toggleModal('modalOcrScanner', true);
+      setTimeout(() => {
+        toggleModal('modalOcrScanner', false);
+        document.getElementById('inputTitle').value = 'Restaurante Sabor Carioca';
+        document.getElementById('inputAmount').value = '54.90';
+        setTxType('expense');
+        alert('📸 Comprovante reconhecido via OCR local!\n\n• Estabelecimento: Restaurante Sabor Carioca\n• Valor Total: R$ 54,90\n• Categoria Sugerida: Alimentação\n\nOs campos foram preenchidos automaticamente no formulário.');
+      }, 1400);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+name: finflow
+description: "FinFlow - Aplicativo de Gestão Financeira Pessoal E2E Offline-First em Flutter"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management & Architecture
+  flutter_bloc: ^8.1.3
+  equatable: ^2.0.5
+  get_it: ^7.6.0
+  dartz: ^0.10.1
+
+  # Local Persistence & Security (Offline-First)
+  drift: ^2.14.1
+  sqlite3_flutter_libs: ^0.5.18
+  path_provider: ^2.1.2
+  path: ^1.8.3
+  flutter_secure_storage: ^9.0.0
+  local_auth: ^2.1.8
+
+  # UI, Fonts & Formatting
+  intl: ^0.19.0
+  fl_chart: ^0.66.0
+  uuid: ^4.3.3
+
+  # PDF Generation & Sharing
+  pdf: ^3.10.8
+  printing: ^5.12.0
+
+  # Camera & On-Device OCR (Google ML Kit)
+  image_picker: ^1.0.7
+  google_mlkit_text_recognition: ^0.13.0
+
+  # AI & Virtual Assistant (Google Gemini SDK)
+  google_generative_ai: ^0.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  bloc_test: ^9.1.5
+  mocktail: ^1.0.3
+
+flutter:
+  uses-material-design: true
+
